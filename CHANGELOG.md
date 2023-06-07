@@ -1,3 +1,32 @@
+## [1.1.0](https://github.com/RustFields/ScaFi-fields/compare/1.0.0...1.1.0) (2023-06-07)
+
+
+### Features
+
+* add additional functionality for fields ([58c3277](https://github.com/RustFields/ScaFi-fields/commit/58c32770917c055ce55e2775ededc198f446d177))
+* add Defaultable concept ([9c68ee2](https://github.com/RustFields/ScaFi-fields/commit/9c68ee2025cb4a66df795c0e98a5ccbe12ebf226))
+* add Field concept ([2403e75](https://github.com/RustFields/ScaFi-fields/commit/2403e753db786362d878677a16fbe7a86afee756))
+
+
+### General maintenance
+
+* [skip ci] update version in build.sbt ([06b8abd](https://github.com/RustFields/ScaFi-fields/commit/06b8abd47f438b57e3d20642654339014a1b63f3))
+
+
+### Dependency updates
+
+* **deps:** update dependency sbt/sbt to v1.9.0 ([8899ce4](https://github.com/RustFields/ScaFi-fields/commit/8899ce42ea2c121bd1fe21c59b213dec5454a0ee))
+
+
+### Build and continuous integration
+
+* add cats and scalatest as dependency ([2053941](https://github.com/RustFields/ScaFi-fields/commit/20539414c6bbe5960b6e1662e9fd9ed93773d820))
+
+
+### Tests
+
+* add test suite for fields api ([8e0038e](https://github.com/RustFields/ScaFi-fields/commit/8e0038eda429398a87e09be1b879d7a7b4546b66))
+
 ## 1.0.0 (2023-06-07)
 
 
