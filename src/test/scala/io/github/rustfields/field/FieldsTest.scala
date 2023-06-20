@@ -1,8 +1,7 @@
-package field
+package io.github.rustfields.field
 
-import field.FieldTest
-import field.DefaultableInstances.given
 import org.scalatest.funsuite.AnyFunSuite
+import io.github.rustfields.field.DefaultableInstances.given
 
 class FieldsTest extends AnyFunSuite with FieldTest:
   test("Field creation") {

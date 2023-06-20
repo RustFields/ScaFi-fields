@@ -1,4 +1,4 @@
-package field
+package io.github.rustfields.field
 
 import cats.instances.all._
 import cats.kernel.Monoid

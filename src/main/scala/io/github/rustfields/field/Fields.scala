@@ -1,4 +1,4 @@
-package field
+package io.github.rustfields.field
 
 trait Fields:
 
