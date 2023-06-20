@@ -8,7 +8,7 @@ git push --force origin || exit 4`
 const publishCommands = `
 git tag -a -f \${nextRelease.version} \${nextRelease.version} -F CHANGELOG.md  || exit 1
 git push --force origin \${nextRelease.version} || exit 2
-sbt assembly || exit 3
+sbt publishLocal || exit 3
 `
 const releaseBranches = ["main"]
 config.branches = releaseBranches
