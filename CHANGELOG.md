@@ -1,3 +1,34 @@
+## [2.0.0](https://github.com/RustFields/ScaFi-fields/compare/1.1.0...2.0.0) (2023-06-20)
+
+
+### ⚠ BREAKING CHANGES
+
+* add organization packages
+
+### Dependency updates
+
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.32 ([3d62273](https://github.com/RustFields/ScaFi-fields/commit/3d622735719ae492055ce81d2184c4253f2abddb))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.33 ([20b9da2](https://github.com/RustFields/ScaFi-fields/commit/20b9da26ec91a1405349cb61f42ba02853fcc57c))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.35 ([f53fb72](https://github.com/RustFields/ScaFi-fields/commit/f53fb7268a386488006a1e459fb82914c17057ce))
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.37 ([51c1f22](https://github.com/RustFields/ScaFi-fields/commit/51c1f229bacd27b900a8b0fe3051392c0d99045f))
+
+
+### General maintenance
+
+* [skip ci] update version in build.sbt ([87ad11d](https://github.com/RustFields/ScaFi-fields/commit/87ad11d9a30b6af80dd1b4110d958370d773b83f))
+* add .gitattributes ([befb46f](https://github.com/RustFields/ScaFi-fields/commit/befb46fc8f5361ca8b1958eee58043ea9f2d0c36))
+* add organization packages ([f0a8b0b](https://github.com/RustFields/ScaFi-fields/commit/f0a8b0b356a6f222481f3180a2ed2c05384e195f))
+
+
+### Build and continuous integration
+
+* add prepareCommands in Semantic Release configuration ([4f69129](https://github.com/RustFields/ScaFi-fields/commit/4f69129a65a51b0f96f72fec9bafc114448a577a))
+* add sbt-assembly plugin ([1387858](https://github.com/RustFields/ScaFi-fields/commit/138785883438d38663c454727a81e4c40971a1f3))
+* add ScaFi-core dependency ([98ad243](https://github.com/RustFields/ScaFi-fields/commit/98ad2434366dbd3872b22bafce031fe2b9121edf))
+* improve Semantic Release configuration ([d639a69](https://github.com/RustFields/ScaFi-fields/commit/d639a692d21472643e2e6e13e589d25a0b32d9ba))
+* **Mergify:** configuration update ([02fe478](https://github.com/RustFields/ScaFi-fields/commit/02fe4783c840543a5aa71a29c997d8580a4aa18b))
+* remove SBT Assembly plugin ([ebc5b79](https://github.com/RustFields/ScaFi-fields/commit/ebc5b796c2618b1049e768cac13f3e948f4f5b1b))
+
 ## [1.1.0](https://github.com/RustFields/ScaFi-fields/compare/1.0.0...1.1.0) (2023-06-07)
 
 
