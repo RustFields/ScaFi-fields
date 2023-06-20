@@ -1,11 +1,11 @@
-package field
+package io.github.rustfields.field
 
 import cats.implicits.*
-import field.DefaultableInstances.given
-import field.FieldTest
+import io.github.rustfields.field.FieldOps
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.matchers.should.Matchers.shouldBe
+import io.github.rustfields.field.DefaultableInstances.given
 
 class FieldsOpsTest extends AnyFlatSpec with FieldTest with FieldOps:
 
