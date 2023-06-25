@@ -1,6 +1,6 @@
-package io.github.rustfields.test
+package io.github.rustfields.field
 
-import cats.Monad
+import cats.{Monad, catsInstancesForId}
 import io.github.rustfields.lang.FieldCalculusSyntax
 
 trait Fields:
@@ -29,6 +29,13 @@ trait Fields:
      * the field with an empty map and the lifted value as a default
      */
     def lift[A](a: A): Field[A] = Field(Map.empty, a)
+  
+  object FieldGivens:
+    given localToFieldConversion[A]: Conversion[A, Field[A]] with
+      def apply(a: A): Field[A] = Field.lift(a)
+      
+    given fieldToLocalConversion[A]: Conversion[Field[A], A] with
+      def apply(field: Field[A]): A = field.getMap.getOrElse(mid(), field.default)
 
     given Monad[Field] with
       override def pure[A](x: A): Field[A] = Field.lift(x)

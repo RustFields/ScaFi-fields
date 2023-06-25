@@ -1,4 +1,4 @@
-package io.github.rustfields.test
+package io.github.rustfields.field
 
 import cats.Monad
 import cats.implicits.*

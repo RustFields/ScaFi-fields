@@ -1,4 +1,4 @@
-package io.github.rustfields.test
+package io.github.rustfields.field
 
 /** Trait for types that have a default value.
  * @tparam A
