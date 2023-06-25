@@ -1,19 +1,26 @@
 package io.github.rustfields.test
 
 import cats.implicits.*
+import io.github.rustfields.field.FieldOps
 import io.github.rustfields.lang.FieldCalculusInterpreter
-import io.github.rustfields.test.FieldOps
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.matchers.should.Matchers.shouldBe
-import io.github.rustfields.test.DefaultableInstances.given
+import io.github.rustfields.field.DefaultableInstances.given
+import io.github.rustfields.vm.Context
 
 class FieldsOpsTest extends AnyFlatSpec with FieldTest with TestUtils:
-  given node: FieldCalculusInterpreter = new FieldCalculusInterpreter {}
+  given node: FieldCalculusInterpreter = CoreTestInterpreter
 
-  val context = ctx(selfId = 0, exports = Map())
-  // ACT
-  val res = round(context, 77).root[Int]()
+  val context: Context = ctx(selfId = 0, exports = Map())
+
+
+  "Local values" should "be able to be combined as fields" in {
+    val res1: Int = round(context, 77).root[Int]()
+    val res2: Int = round(context, 23).root[Int]()
+    val res3: Field[Int] = res1 + res2
+    res3 shouldBe Field.lift(100)
+  }
 
   "Mapping a field" should "yield a new Field" in {
     val f = Field(Map(mid() -> 1, 2 -> 1))
@@ -59,7 +66,7 @@ class FieldsOpsTest extends AnyFlatSpec with FieldTest with TestUtils:
   }
 
   "Fields" should "be able to be applied to functions" in {
-    val field = Field.lift(1)
+    val field: Field[Int] = 1
     val plusOne = (x: Int) => x + 1
 
     val result = field >> plusOne >> plusOne >> plusOne
