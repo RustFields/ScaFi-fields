@@ -1,9 +1,13 @@
-package io.github.rustfields.field
+package io.github.rustfields.test
 
 import cats.instances.all._
 import cats.kernel.Monoid
 import cats.syntax.all._
-trait FieldOps extends MonadicFields:
+import io.github.rustfields.test.Fields
+
+trait FieldOps:
+  self: Fields =>
+  
   def applyToAll[A, B](f: Field[A], func: A => B): Field[B] =
     applyFunctionField(f, Field.lift(func))
 
