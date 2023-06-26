@@ -1,3 +1,19 @@
+## [3.0.0](https://github.com/RustFields/ScaFi-fields/compare/2.0.0...3.0.0) (2023-06-26)
+
+
+### ⚠ BREAKING CHANGES
+
+* refactor dependencies
+
+### Dependency updates
+
+* **deps:** update dependency semantic-release-preconfigured-conventional-commits to v1.1.38 ([a46a81d](https://github.com/RustFields/ScaFi-fields/commit/a46a81d76aa44b8fc8845129419d5f9d08c1f603))
+
+
+### Refactoring
+
+* refactor dependencies ([1b97768](https://github.com/RustFields/ScaFi-fields/commit/1b97768c938d1a6068dd4da40a9efd50dbf40858))
+
 ## [2.0.0](https://github.com/RustFields/ScaFi-fields/compare/1.1.0...2.0.0) (2023-06-20)
 
 
