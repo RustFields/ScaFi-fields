@@ -1,7 +1,7 @@
 package io.github.rustfields.field.lang
 
 import io.github.rustfields.field.{FieldOps, Fields}
-import io.github.rustfields.lang.FieldCalculusSyntax
+import io.github.rustfields.lang.{AggregateProgram, FieldCalculusInterpreter, FieldCalculusSyntax}
 import io.github.rustfields.vm.Slot.{Nbr, Rep}
 
 trait FieldLanguage:
@@ -40,3 +40,7 @@ trait FieldLanguageImpl extends FieldLanguage with Fields with FieldOps:
       val oldField = vm.context.readExportValue(vm.self, vm.status.path).getOrElse(init)
       fun(oldField)
     }
+
+trait FieldLanguageInterpreter extends FieldCalculusInterpreter with FieldLanguageImpl
+
+trait FieldLanguageProgram extends AggregateProgram with FieldLanguageImpl
