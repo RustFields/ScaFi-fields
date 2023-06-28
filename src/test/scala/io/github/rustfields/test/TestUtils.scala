@@ -9,7 +9,7 @@ trait TestUtils:
            exports: Map[Int, Export] = Map(),
            lsens: Map[String, Any] = Map(),
            nbsens: Map[String, Map[Int, Any]] = Map()
-         )(using node: FieldCalculusInterpreter): Context = {
+         ): Context = {
     val localSensorsWithId = lsens.map { case (k, v) => (Sensor(k): Sensor) -> v }
     val neighborhoodSensorWithId = nbsens.map { case (k, v) =>
       (Sensor(k): Sensor) -> v

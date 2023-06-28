@@ -10,7 +10,7 @@ import io.github.rustfields.field.DefaultableInstances.given
 import io.github.rustfields.vm.Context
 
 class FieldsOpsTest extends AnyFlatSpec with FieldTest with TestUtils:
-  given node: FieldCalculusInterpreter = this
+  //given node: FieldCalculusInterpreter = this
 
   val context: Context = ctx(selfId = 0, exports = Map())
 
