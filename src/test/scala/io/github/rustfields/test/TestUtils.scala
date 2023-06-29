@@ -47,4 +47,4 @@ trait TestUtils:
     if comparer(exp1.root(), exp2.root()) then 
       true 
     else
-      throw new Exception(s"Not equivalent: \n${prog1}\n${prog2}")
+      throw new Exception(s"Not equivalent: \n$prog1\n$prog2")
