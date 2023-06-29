@@ -51,7 +51,7 @@ trait Fields:
   
   object FieldGivens:
     given localToFieldConversion[A]: Conversion[A, Field[A]] with
-      def apply(a: A): Field[A] = Field.lift(a)
+      def apply(a: A): Field[A] = Field.fromSelfValue(a)
       
     given fieldToLocalConversion[A]: Conversion[Field[A], A] with
       def apply(field: Field[A]): A = field.getMap.getOrElse(mid(), field.default)
