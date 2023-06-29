@@ -1,5 +1,6 @@
 package io.github.rustfields.field.lang
 
+import io.github.rustfields.field.syntax.FieldSyntax
 import io.github.rustfields.field.{FieldOps, Fields}
 import io.github.rustfields.lang.{AggregateProgram, FieldCalculusInterpreter, FieldCalculusSyntax}
 import io.github.rustfields.vm.Slot.{Nbr, Rep}
@@ -10,7 +11,7 @@ trait FieldLanguage:
   def nbrf[A](expr: => F[A]): F[A]
   def branchf[A](cond: F[Boolean])(thn: => F[A])(els: => F[A]): F[A]
 
-trait FieldLanguageImpl extends FieldLanguage with Fields with FieldOps:
+trait FieldLanguageImpl extends FieldLanguage with Fields with FieldOps with FieldSyntax:
   self: FieldCalculusSyntax =>
 
   override type F[A] = Field[A]
