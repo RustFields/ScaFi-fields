@@ -5,7 +5,7 @@ import io.github.rustfields.field.DefaultableInstances.given
 import io.github.rustfields.lang.FieldCalculusInterpreter
 import org.scalatest.flatspec.AnyFlatSpec
 
-class FieldsOpsTest extends AnyFlatSpec with FieldTest with TestUtils:
+class FieldsOpsTest extends AnyFlatSpec with FieldTest:
   given node: FieldCalculusInterpreter = this
 
   "Mapping a field" should "yield a new Field" in {
