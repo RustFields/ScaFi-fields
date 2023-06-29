@@ -54,7 +54,7 @@ trait Fields:
       def apply(a: A): Field[A] = Field.fromSelfValue(a)
       
     given fieldToLocalConversion[A]: Conversion[Field[A], A] with
-      def apply(field: Field[A]): A = field.getMap.getOrElse(mid(), field.default)
+      def apply(field: Field[A]): A = Field.selfValue(field)
 
     given Monad[Field] with
       override def pure[A](x: A): Field[A] = Field.lift(x)
