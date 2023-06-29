@@ -22,7 +22,7 @@ trait FieldLanguageImpl extends FieldLanguage with Fields with FieldOps with Fie
   override def nbrf[A](expr: => Field[A]): Field[A] =
     def readNeighbourValue[T](id: Int): Option[T] = vm.context.readExportValue(id, vm.status.path)
 
-    vm.nest(Nbr(vm.index))(write = vm.unlessFoldingOnOthers) {
+    vm.nest(Nbr(vm.index))(write = vm.onlyWhenFoldingOnSelf) {
       val nbrs = vm.alignedNeighbours()
       Field(
         nbrs.map(nbrId => { // for each neighbour
