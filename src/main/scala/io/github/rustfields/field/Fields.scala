@@ -29,6 +29,34 @@ trait Fields:
      * the field with an empty map and the lifted value as a default
      */
     def lift[A](a: A): Field[A] = Field(Map.empty, a)
+
+    /**
+     * Create a field with a single value for the current device, 
+     * using said value as the default value.
+     * @param a the value to use
+     * @tparam A the type of the value
+     * @return the field
+     */
+    def fromSelfValue[A](a: A): Field[A] = 
+      Field(Map(mid() -> a), a)
+
+    /**
+     * Create a field with a single value for the current device
+     * @param a the value to use
+     * @tparam A the type of the value
+     * @return the field
+     */
+    def fromSelfValue[A: Defaultable](a: A): Field[A] =
+      Field(Map(mid() -> a))
+
+    /**
+     * Returns the value of the field for the current device
+     * @param f the field
+     * @tparam A the type of the field
+     * @return the value of the field for the current device
+     */
+    def selfValue[A](f: Field[A]): A =
+      f.getMap.getOrElse(mid(), f.default)
   
   object FieldGivens:
     given localToFieldConversion[A]: Conversion[A, Field[A]] with
