@@ -1,18 +1,15 @@
 package io.github.rustfields.field
 
-import cats.instances.all._
+
 import cats.kernel.Monoid
-import cats.syntax.all._
-import io.github.rustfields.field.Fields
+import cats.syntax.all.*
 
 trait FieldOps:
   self: Fields =>
 
   export FieldGivens.given
-
-  def applyToAll[A, B](f: Field[A], func: A => B): Field[B] =
-    applyFunctionField(f, Field.lift(func))
-
+  export cats.instances.all._
+  
   def applyFunctionField[A, B](f1: Field[A], f2: Field[A => B]): Field[B] =
     for
       v1 <- f1
