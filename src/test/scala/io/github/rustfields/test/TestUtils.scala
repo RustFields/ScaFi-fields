@@ -48,3 +48,6 @@ trait TestUtils:
       true 
     else
       throw new Exception(s"Not equivalent: \n$prog1\n$prog2")
+
+  def fullyConnectedTopologyMap(elems: mutable.Iterable[Int]): Map[Int, List[Int]] =
+    elems.map { e => e -> elems.toList }.toMap
