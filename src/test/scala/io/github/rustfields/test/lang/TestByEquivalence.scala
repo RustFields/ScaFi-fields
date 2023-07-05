@@ -54,7 +54,7 @@ class TestByEquivalence extends AnyFunSpec with FieldTest with Matchers:
   }
 
   //todo does not pass
-  /*checkThat("rep.nbr is to be ignored overall") {
+  checkThat("rep.nbr is to be ignored overall") {
     val fixture = new Fixture
 
     assertEquivalence(fixture.devicesAndNbrs, fixture.execSequence) {
@@ -69,7 +69,7 @@ class TestByEquivalence extends AnyFunSpec with FieldTest with Matchers:
           old * 2 + mid()
         }
     }
-  }*/
+  }
 
   checkThat("fold.fold basically works") {
     val fixture = new Fixture
