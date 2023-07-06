@@ -36,7 +36,7 @@ trait FieldLanguageImpl extends FieldLanguage with Fields with FieldOps with Fie
     }
 
   override def repf[A](init: => Field[A])(fun: Field[A] => Field[A]): Field[A] =
-    vm.nest(Rep(vm.index))(write = vm.onlyWhenFoldingOnSelf) {
+    vm.nest(Rep(vm.index))(write = vm.unlessFoldingOnOthers) {
       // get the old value of the field
       val oldField = vm.context.readExportValue(vm.self, vm.status.path).getOrElse(init)
       fun(oldField)
