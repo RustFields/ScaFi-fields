@@ -3,13 +3,14 @@ package io.github.rustfields.field.lang
 import io.github.rustfields.field.syntax.FieldSyntax
 import io.github.rustfields.field.{FieldOps, Fields}
 import io.github.rustfields.lang.{AggregateProgram, FieldCalculusInterpreter, FieldCalculusSyntax}
-import io.github.rustfields.vm.Slot.{Nbr, Rep}
+import io.github.rustfields.vm.Slot.{FoldHood, Nbr, Rep}
 
 trait FieldLanguage:
   type F[A]
   def repf[A](init: => F[A])(fun: F[A] => F[A]): F[A]
   def nbrf[A](expr: => F[A]): F[A]
   def branchf[A](cond: F[Boolean])(thn: => F[A])(els: => F[A]): F[A]
+  def foldhoodf[A](init: => F[A])(fun: (A, A) => A): F[A]
 
 trait FieldLanguageImpl extends FieldLanguage with Fields with FieldOps with FieldSyntax:
   self: FieldCalculusSyntax =>
@@ -40,6 +41,14 @@ trait FieldLanguageImpl extends FieldLanguage with Fields with FieldOps with Fie
       // get the old value of the field
       val oldField = vm.context.readExportValue(vm.self, vm.status.path).getOrElse(init)
       fun(oldField)
+    }
+
+  override def foldhoodf[A](init: => Field[A])(fun: (A, A) => A): Field[A] =
+    val nbrfield = nbrf(vm.locally(init))
+    vm.nest(FoldHood(vm.index))(write = true) {
+      vm.locally {
+        nbrfield.fold(fun)
+      }
     }
 
 trait FieldLanguageInterpreter extends FieldCalculusInterpreter with FieldLanguageImpl
