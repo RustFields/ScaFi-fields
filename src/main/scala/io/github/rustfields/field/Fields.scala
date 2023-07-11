@@ -40,6 +40,13 @@ trait Fields:
     def fromSelfValue[A](a: A): Field[A] = 
       Field(Map(mid() -> a), a)
 
+    def fromExpression[A](expr: => A, default: A): Field[A] =
+      val nbrs = vm.alignedNeighbours()
+      Field(nbrs.map(id => id -> vm.foldedEval(expr)(id).getOrElse(default)).toMap, default)
+
+    def get[A](f: Field[A], id: Int): A =
+      f.getMap.getOrElse(id, f.default)
+
     /**
      * Returns the value of the field for the current device
      * @param f the field
