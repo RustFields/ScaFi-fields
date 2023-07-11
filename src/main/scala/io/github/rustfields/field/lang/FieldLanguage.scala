@@ -39,7 +39,7 @@ trait FieldLanguageImpl extends FieldLanguage with Fields with FieldOps with Fie
   override def foldhoodf[A](init: => Field[A])(fun: (A, A) => A): A =
     vm.nest(FoldHood(vm.index))(write = true) {
       vm.locally {
-        nbrfield.fold(fun)
+        vm.isolate(init.fold(init.default)((a1, a2) => fun(a1, a2)))
       }
     }
     
