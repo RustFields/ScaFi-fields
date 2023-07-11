@@ -4,6 +4,7 @@ import io.github.rustfields.test.FieldTest
 import io.github.rustfields.vm.Context
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
+import scala.language.implicitConversions
 
 
 class TestLangByRound extends AnyFunSpec with FieldTest with Matchers:
