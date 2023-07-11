@@ -53,8 +53,8 @@ trait Fields:
       val nbrs = vm.alignedNeighbours()
       Field[A](f.getMap.filter((id, _) => nbrs.contains(id)), f.default)
 
-    def fold[A](f: Field[A])(aggr: (A, A) => A): A =
-      toNeighbouring(f).getMap.values.fold(f.default)(aggr)
+    def fold[A](f: Field[A])(z: A)(aggr: (A, A) => A): A =
+      toNeighbouring(f).getMap.values.fold(z)(aggr)
 
   object FieldGivens:
     given localToFieldConversion[A]: Conversion[A, Field[A]] with
