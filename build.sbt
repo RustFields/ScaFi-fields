@@ -1,6 +1,7 @@
 ThisBuild / version := "3.0.0"
 ThisBuild / scalaVersion := "3.3.0"
 ThisBuild / organization := "io.github.rustfields"
+ThisBuild / scalacOptions ++= Seq("-feature", "-deprecation")
 
 lazy val core = ProjectRef(uri("https://github.com/RustFields/ScaFi-core.git"), "root")
 
