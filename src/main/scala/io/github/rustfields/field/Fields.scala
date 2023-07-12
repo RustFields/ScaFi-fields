@@ -1,6 +1,6 @@
 package io.github.rustfields.field
 
-import cats.{Monad, catsInstancesForId}
+import cats.Monad
 import io.github.rustfields.lang.FieldCalculusSyntax
 
 trait Fields:
