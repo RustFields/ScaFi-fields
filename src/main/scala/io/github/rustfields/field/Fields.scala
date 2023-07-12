@@ -2,6 +2,7 @@ package io.github.rustfields.field
 
 import cats.Monad
 import io.github.rustfields.lang.FieldCalculusSyntax
+import scala.language.implicitConversions
 
 trait Fields:
   self: FieldCalculusSyntax =>
@@ -112,7 +113,7 @@ trait Fields:
               b.getMap.getOrElse(id, b.default)
             }
           },
-          f(fa.default).default
+          f(fa.default)
         )
 
       override def tailRecM[A, B](a: A)(
