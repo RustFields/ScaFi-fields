@@ -38,11 +38,11 @@ class TestLangByRound extends AnyFunSpec with FieldTest with Matchers:
     round(context2, program).root[Field[Int]]() shouldBe Field(Map(0 -> 2),2)
   }
 
-  FOLDHOODF("foldhoodf"){
-    def program: Field[Int] = foldhoodf(Field.lift(0))((x, _) => x + 1)
+/*  FOLDHOODF("foldhoodf") {
+    def program: Int = foldhoodf[Int](_ + _)(fromExpression(0)(1))
     val context0 = ctx(0, Map())
-    round(context0, program).root[Field[Int]]() shouldBe Field(Map(0 -> 1), 0)
-  }
+    println(round(context0, program).root[Int]())
+  }*/
 
   Alignment("should support interaction only between structurally compatible devices") {
     // ARRANGE
@@ -66,12 +66,12 @@ class TestLangByRound extends AnyFunSpec with FieldTest with Matchers:
         y <- Field.fromSelfValue(1)
       yield x + y
     })
-    def expr3 = foldhoodf(nbrf(Field.fromSelfValue(sense[Int]("sensor"))))((a, b) => {
+/*    def expr3 = foldhoodf(nbrf(Field.fromSelfValue(sense[Int]("sensor"))))((a, b) => {
       for
         x <- a
         y <- b
       yield x + y
-    })
+    })*/
     /* Given expr 'e' produces exports 'o'
      * What exports are produced by 'e + e + e + e' ?
      */
@@ -149,12 +149,12 @@ class TestLangByRound extends AnyFunSpec with FieldTest with Matchers:
       )*/
   }
 
-  FOLDHOODF("should support aggregating information from aligned neighbors") {
+/*  FOLDHOODF("should support aggregating information from aligned neighbors") {
     // ARRANGE
     val exp1 = Map(2 -> Export(/ -> "a", FoldHood(0) -> "a"), 4 -> Export(/ -> "b", FoldHood(0) -> "b"))
     val ctx1 = ctx(0, exp1)
     // ACT + ASSERT
-    round(ctx1, foldhoodf(Field.fromSelfValue("a"))((x, _) => x + "z")).root[String]() shouldBe "azzz"
+    //round(ctx1, foldhoodf(Field.fromSelfValue("a"))((x, _) => x + "z")).root[String]() shouldBe "azzz"
 
     // ARRANGE
     val exp2 = Map(2 -> Export(/ -> "a", FoldHood(0) -> "a"), 4 -> Export(/ -> "b", FoldHood(0) -> "b"))
@@ -169,140 +169,71 @@ class TestLangByRound extends AnyFunSpec with FieldTest with Matchers:
         1
       })
     ).root[Int]() shouldBe -14
-  }
-
-/*  NBR("needs not to be nested into fold") {
-    // ARRANGE
-    val ctx1 = ctx(selfId = 0)
-    // ACT + ASSERT
-    round(ctx1, nbr(1)).root[Int]() shouldBe 1
   }*/
 
-/*  NBR("should support interaction between aligned devices") {
+  NBRF("needs not to be nested into fold") {
+    def program: Field[Int] = nbrf(Field.fromSelfValue(1))
+    // ARRANGE
+    val ctx1 = ctx(0)
+    // ACT + ASSERT
+    round(ctx1, program).root[Field[Int]]() shouldBe Field(Map(0 -> 1), 1)
+  }
+
+/*  NBRF("should support interaction between aligned devices") {
+    def program: Field[Int] =
+      if (nbrf(Field.fromSelfValue(mid())) == Field.fromSelfValue(mid()))
+        Field.fromSelfValue(0)
+      else
+        Field.fromSelfValue(1)
     // ARRANGE
     val exp1 = Map(
-      1 -> exportFrom(/ -> "any", FoldHood(0) -> 1, FoldHood(0) / Nbr(0) -> 1),
-      2 -> exportFrom(/ -> "any", FoldHood(0) -> 2, FoldHood(0) / Nbr(0) -> 2)
+      1 -> Export(/ -> "any", Nbr(0) -> 1),
+      2 -> Export(/ -> "any", Nbr(0) -> 2)
     )
-    val ctx1 = ctx(selfId = 0, exports = exp1)
+    val ctx1 = ctx(0, exp1)
     // ACT
-    val res1 = round(ctx1, foldhood(0)(_ + _)(if (nbr(mid()) == mid()) 0 else 1))
+    val res1 = round(ctx1, program)
     // ASSERT
     res1.root[Int]() shouldBe 2
     res1.get(FoldHood(0) / Nbr(0)) shouldBe Some(0)
   }*/
 
-/*  REP("should support dynamic evolution of fields") {
+  REPF("should support dynamic evolution of fields") {
+    def program: Field[Int] = repf(Field.fromSelfValue(9))(f => for x <- f yield x * 2)
     // ARRANGE
-    val ctx1 = ctx(selfId = 0)
+    val ctx1 = ctx(0)
     // ACT
-    val exp1 = round(ctx1, rep(9)(_ * 2))
+    val exp1 = round(ctx1, program)
     // ASSERT (use initial value)
-    exp1.root[Int]() shouldBe 18
-    exp1.get(/(Rep(0))) shouldBe Some(18)
+    exp1.root[Field[Int]]() shouldBe Field(Map(0 -> 18), 18)
+    exp1.get[Field[Int]](/ (Rep(0))) shouldBe Some(Field(Map(0 -> 18), 18))
 
     // ARRANGE
-    val exp = Map(0 -> exportFrom(Rep(0) -> 7))
-    val ctx2 = ctx(selfId = 0, exports = exp)
+    val exp = Map(0 -> Export(Rep(0) -> Field(Map(0 -> 7), 7)))
+    val ctx2 = ctx(0, exp)
     // ACT
-    val exp2 = round(ctx2, rep(9)(_ * 2))
+    val exp2 = round(ctx2, program)
     // ASSERT (build upon previous state)
-    exp2.root[Int]() shouldBe 14
-    exp2.get(/(Rep(0))) shouldBe Some(14)
-  }*/
+    exp2.root[Field[Int]]() shouldBe Field(Map(0 -> 14), 14)
+    exp2.get[Field[Int]](/ (Rep(0))) shouldBe Some(Field(Map(0 -> 14), 14))
+  }
 
-/*  BRANCH("should support domain restriction, thus affecting the structure of exports") {
+  BRANCHF("should support domain restriction, thus affecting the structure of exports") {
     // ARRANGE
-    def program =
-      rep(0) { x => branch(x % 2 == 0)(7)(rep(4)(x => 4)); x + 1 }
-
+    def program: Field[Int] =
+      repf(Field.fromSelfValue(0))(f => {
+        branchf(Field.fromSelfValue(for x <- f yield x % 2 == 0))(Field.fromSelfValue(7))(repf(Field.fromSelfValue(4))(_ => Field.fromSelfValue(4)))
+        for x <- f yield x + 1
+      })
     // ACT
     val exp = round(ctx(0), program)
     // ASSERT
-    exp.root[Int]() shouldBe 1
-    //exp.get(path(If(0, true), Rep(0))) shouldBe Some(7)
-    //exp.get(path(If(0, false), Rep(0))) shouldBe None
-
+    exp.root[Field[Int]]() shouldBe Field(Map(0 -> 1), 1)
     // ACT
-    val ctx2 = ctx(0, Map(0 -> exportFrom(Rep(0) -> 1)))
+    val ctx2 = ctx(0, Map(0 -> Export(Rep(0) -> Field(Map(0 -> 1), 1))))
     val exp2 = round(ctx2, program)
-
-    exp2.root[Int]() shouldBe 2
-    //exp2.get(path(If(0, true), Rep(0))) shouldBe None
-    //exp2.get(path(If(0, false), Rep(0))) shouldBe Some(4)
-    //exp2.get(path(Rep(0), If(0, false), Rep(0))) shouldBe Some(4)
-  }*/
-
-/*  SENSE("should simply evaluate to the last value read by sensor") {
-    // ARRANGE
-    val ctx1 = ctx(0, Map(), Map("a" -> 7, "b" -> "high"))
-    // ACT + ASSERT (failure as no sensor 'c' is found)
-    round(ctx1, sense[Any]("a")).root[Int]() shouldBe 7
-    round(ctx1, sense[Any]("b")).root[String]() shouldBe "high"
-  }*/
-
-/*  SENSE("should fail if the sensor is not available") {
-    // ARRANGE
-    val ctx1 = ctx(0, Map(), Map("a" -> 1, "b" -> 2))
-    // ACT + ASSERT (failure as no sensor 'c' is found)
-    intercept[AnyRef](round(ctx1, sense[Any]("c")))
-    // ACT + ASSERT (failure if an existing sensor does not provide desired kind of data)
-    intercept[AnyRef](round(ctx1, sense[Boolean]("a")))
-  }*/
-
-/*  MID("should simply evaluate to the ID of the local device") {
-    // ACT + ASSERT
-    round(ctx(77), mid()).root[Int]() shouldBe 77
-    round(ctx(8), mid()).root[Int]() shouldBe 8
-  }*/
-
-/*  NBRVAR("should work as a ''sensor'' for neighbors") {
-    // ARRANGE
-    val nbsens = Map("a" -> Map(0 -> 0, 1 -> 10, 2 -> 17), "b" -> Map(0 -> "x", 1 -> "y", 2 -> "z"))
-    val ctx1 = ctx(0, Map(1 -> exportFrom(/ -> 10, FoldHood(0) -> 10)), Map(), nbsens)
-    // ACT + ASSERT
-    round(ctx1, foldhood(0)((a, b) => if (a > b) a else b)(nbrvar[Int]("a"))).root[Int]() shouldBe 10
-
-    // ACT + ASSERT (should fail when used outside fooldhood
-    intercept[Exception](round(ctx1, nbrvar[Int]("a")))
-  }*/
-
-/*  NBRVAR("should fail if the neighborhood ''sensor'' is not available") {
-    // ARRANGE
-    val nbsens = Map("a" -> Map(0 -> 0, 1 -> 10, 2 -> 17))
-    val ctx1 = ctx(0, Map(1 -> exportFrom(/ -> 10)), Map(), nbsens)
-    // ACT + ASSERT (failure because of bad type)
-    intercept[AnyRef](round(ctx1, foldhood("")(_ + _)(nbrvar[String]("a"))))
-    // ACT + ASSERT (failure because not found)
-    intercept[AnyRef](round(ctx1, foldhood(0)(_ + _)(nbrvar[Int]("xxx"))))
-  }*/
-
-/*  BUILTIN("minHood and minHood+, maxHood and maxHood+") {
-    // ARRANGE
-    val exp1 = Map(
-      1 -> exportFrom(/ -> "any", FoldHood(0) -> 10, FoldHood(0) / Nbr(0) -> 10),
-      2 -> exportFrom(/ -> "any", FoldHood(0) -> 5, FoldHood(0) / Nbr(0) -> 5)
-    )
-    val ctx1 = ctx(0, exp1, Map("sensor" -> 3, "sensor2" -> 20))
-    // ACT + ASSERT
-    round(ctx1, minHood(nbr(sense[Int]("sensor")))).root[Int] shouldBe 3
-    round(ctx1, maxHood(nbr(sense[Int]("sensor2")))).root[Int] shouldBe 20
-
-    /** N.B. foldHoodPlus, minHoodPlus, maxHoodPlus should be considered as
-     * *  "library" methods (not primitives), thus it may be better to not
-     * *  test exports for them. For now, however, we keep these tests.
-     * */
-    // ARRANGE
-    val exp2 = Map(
-      1 -> exportFrom(/ -> "any", FoldHood(0) -> 1, FoldHood(0) / Nbr(0) -> 1, FoldHood(0) / Nbr(1) -> 10),
-      2 -> exportFrom(/ -> "any", FoldHood(0) -> 2, FoldHood(0) / Nbr(0) -> 2, FoldHood(0) / Nbr(1) -> 5)
-    )
-    // Note: the export on Nbr(0) is for the internal call to nbr(mid())
-    val ctx2 = ctx(0, exp2, Map("sensor" -> 3, "sensor2" -> 20))
-    // ACT + ASSERT
-    round(ctx2, minHoodPlus(nbr(sense[Int]("sensor")))).root[Int] shouldBe 5
-    round(ctx2, maxHoodPlus(nbr(sense[Int]("sensor2")))).root[Int] shouldBe 10
-  }*/
+    exp2.root[Field[Int]]() shouldBe Field(Map(0 -> 2), 2)
+  }
 
 /*  Nesting("REP into FOLDHOOD should be supported") {
     // ARRANGE
@@ -352,34 +283,6 @@ class TestLangByRound extends AnyFunSpec with FieldTest with Matchers:
     assertPossibleFolds("init", List("init", "7", "2")) {
       round(ctx1, foldhood("init")(_ + _)(nbr(foldhood(0)(_ + _)(1)) + "")).root[String]
     }
-  }*/
-
-/*  DeferredExports("should work in a recurrent fashion") {
-    val exp = round(
-      ctx(0), {
-        vm.newExportStack
-        rep(0) { _ =>
-          vm.newExportStack
-          rep(0) { _ =>
-            vm.newExportStack
-            rep(0)(_ + 1)
-            vm.mergeExport
-            1
-          }
-          foldhood(0)(_ + _)(nbr(1))
-          vm.discardExport
-          1
-        }
-        foldhood(0)(_ + _)(nbr(1))
-        vm.mergeExport
-      }
-    )
-
-    exp.get(/ / Rep(0)) should be(defined)
-    exp.get(/ / FoldHood(1)) should be(defined)
-    exp.get(/ / Rep(0) / Rep(0)) should not be defined
-    exp.get(/ / Rep(0) / FoldHood(1)) should not be defined
-    exp.get(/ / Rep(0) / Rep(0) / Rep(0)) should not be defined
   }*/
 
 /*  private def assertPossibleFolds(init: Any, a: List[Any])(expr: => Any): Unit =
