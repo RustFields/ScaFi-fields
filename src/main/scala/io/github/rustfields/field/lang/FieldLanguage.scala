@@ -46,6 +46,9 @@ trait FieldLanguageImpl extends FieldLanguage with Fields with FieldOps with Fie
   override def fromExpression[A](default: A)(expr: => A): Field[A] =
     Field.fromExpression(default)(expr)
 
+object FieldLanguageImpl:
+  type FieldLanguageComponent = FieldLanguageImpl with Fields with FieldSyntax with FieldCalculusSyntax
+
 trait FieldLanguageInterpreter extends FieldCalculusInterpreter with FieldLanguageImpl
 
 trait FieldLanguageProgram extends AggregateProgram with FieldLanguageImpl
