@@ -10,8 +10,8 @@ trait FieldLanguage:
   def repf[A](init: => F[A])(fun: F[A] => F[A]): F[A]
   def nbrf[A](expr: => A): F[A]
   def branchf[A](cond: F[Boolean])(thn: => F[A])(els: => F[A]): F[A]
-  def foldhoodf[A](init: => F[A])(fun: (A, A) => A): A
-  def fromExpression[A](expr: => A, default: A): F[A]
+  def foldhoodf[A](fun: (A, A) => A)(init: => F[A]): A
+  def fromExpression[A](default: A)(expr: => A): F[A]
 
 trait FieldLanguageImpl extends FieldLanguage with Fields with FieldOps with FieldSyntax:
   self: FieldCalculusSyntax =>
@@ -36,15 +36,15 @@ trait FieldLanguageImpl extends FieldLanguage with Fields with FieldOps with Fie
       fun(oldField)
     }
 
-  override def foldhoodf[A](init: => Field[A])(fun: (A, A) => A): A =
+  override def foldhoodf[A](fun: (A, A) => A)(init: => Field[A]): A =
     vm.nest(FoldHood(vm.index))(write = true) {
       vm.locally {
         vm.isolate(init.neighbouring.fold(init.default)((a1, a2) => fun(a1, a2)))
       }
     }
     
-  override def fromExpression[A](expr: => A, default: A): Field[A] =
-    Field.fromExpression(expr, default)
+  override def fromExpression[A](default: A)(expr: => A): Field[A] =
+    Field.fromExpression(default)(expr)
 
 trait FieldLanguageInterpreter extends FieldCalculusInterpreter with FieldLanguageImpl
 
