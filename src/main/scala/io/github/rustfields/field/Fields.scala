@@ -54,7 +54,7 @@ trait Fields:
      * @return the value of the field for the current device
      */
     def selfValue[A](f: Field[A]): A =
-      f.getMap.getOrElse(mid(), f.default)
+      get(f, mid())
 
     def toNeighbouring[A](f: Field[A]): Field[A] =
       val nbrs = vm.alignedNeighbours()
