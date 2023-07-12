@@ -153,7 +153,8 @@ class TestByEquivalence extends AnyFlatSpec with FieldTest with Matchers:
   }
 
   //todo does not pass
-  /*"Performance" should "not degrade when nesting foldhoods" in {
+  // > not equivalent
+  "Performance" should "not degrade when nesting foldhoods" in {
     val execSequence = LazyList.continually(Random.nextInt(100)).take(1000)
     val devicesAndNbrs = fullyConnectedTopologyMap(mutable.ArraySeq.from((0 to 99)))
     val max = 0.000001
@@ -164,26 +165,52 @@ class TestByEquivalence extends AnyFlatSpec with FieldTest with Matchers:
       execSequence,
       (x: Double, y: Double) => Math.abs(x - y ) / Math.max(Math.abs(x), Math.abs(y)) < max
     ) {
-      foldhoodf(
-        foldhoodf(
-          foldhoodf(
-            foldhoodf(
-              foldhoodf(
-                foldhoodf(
-                  foldhoodf(
-                    foldhoodf(
-                      foldhoodf(
-                        foldhoodf(fromExpression(1.0, 0.0))(_ + _)
-                      )(_ + _)
-                    )(_ + _)
-                  )(_ + _)
-                )(_ + _)
-              )(_ + _)
-            )(_ + _)
-          )(_ + _)
-        )(_ + _)
-      )(_ + _)
+      foldhoodf[Double](_ + _) {
+        fromExpression(0.0) {
+          foldhoodf[Double](_ + _) {
+            fromExpression(0.0) {
+              foldhoodf[Double](_ + _) {
+                fromExpression(0.0) {
+                  foldhoodf[Double](_ + _) {
+                    fromExpression(0.0) {
+                      foldhoodf[Double](_ + _) {
+                        fromExpression(0.0) {
+                          foldhoodf[Double](_ + _) {
+                            fromExpression(0.0) {
+                              foldhoodf[Double](_ + _) {
+                                fromExpression(0.0) {
+                                  foldhoodf[Double](_ + _) {
+                                    fromExpression(0.0) {
+                                      foldhoodf[Double](_ + _) {
+                                        fromExpression(0.0) {
+                                          foldhoodf[Double](_ + _) {
+                                            fromExpression(0.0) {
+                                              1.0
+                                            }
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     } {
-      Math.pow(foldhoodf(fromExpression(1.0, 0.0))(_ + _), 10)
+      Math.pow(foldhoodf[Double](_ + _) {
+        fromExpression(0.0) {
+          1.0
+        }
+      }, 10)
     }
-  }*/
+  }
