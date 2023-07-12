@@ -5,7 +5,7 @@ import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import io.github.rustfields.field.DefaultableInstances.given_Defaultable_Int
 import org.scalatest.flatspec.AnyFlatSpec
-
+import org.scalactic.Prettifier.default
 import scala.collection.SeqView.Id
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
@@ -28,37 +28,37 @@ class TestByEquivalence extends AnyFlatSpec with FieldTest with Matchers:
 //    val f2: () => Field[Int] = () => nbrf(1 + 2 + mid())
 
     assertEquivalence(fixture.devicesAndNbrs, fixture.execSequence) {
-      foldhoodf(
-        fromExpression(
-          nbrf(1) + nbrf(2) + nbrf(mid()),
-          0)
-      )(_ + _)
+      foldhoodf[Int](_ + _) {
+        fromExpression(0) {
+          nbrf(1) + nbrf(2) + nbrf(mid())
+        }
+      }
     } {
-      foldhoodf(
-        fromExpression(
-          nbrf(1 + 2 + mid()).default,
-          0)
-      )(_ + _)
+      foldhoodf[Int](_ + _) {
+        fromExpression(0) {
+          nbrf(1 + 2 + mid()).default
+        }
+      }
     }
   }
 
   "nbr.nbr" should "be ignored" in {
     val fixture = new Fixture
-//    val f1: () => Field[Int] = () => nbrf(mid() + nbrf(mid()).default).default
+    //    val f1: () => Field[Int] = () => nbrf(mid() + nbrf(mid()).default).default
     val f2: () => Field[Int] = () => nbrf(mid())
 
     assertEquivalence(fixture.devicesAndNbrs, fixture.execSequence) {
-      foldhoodf(
-        fromExpression(
-          nbrf(mid() + nbrf(mid())).default,
-          0)
-      )(_ + _)
+      foldhoodf[Int](_ + _) {
+        fromExpression(0) {
+          nbrf(mid() + nbrf(mid())).default
+        }
+      }
     } {
-      2 * foldhoodf(
-        fromExpression(
-          nbrf(mid()).default,
-          0)
-      )(_ + _)
+      2 * foldhoodf[Int](_ + _) {
+        fromExpression(0) {
+          nbrf(mid()).default
+        }
+      }
     }
   }
 
@@ -68,17 +68,17 @@ class TestByEquivalence extends AnyFlatSpec with FieldTest with Matchers:
     val f2: () => Field[Int] = () => repf(mid())(old => old)
 
     assertEquivalence(fixture.devicesAndNbrs, fixture.execSequence){
-      foldhoodf(
-        fromExpression(
-          repf(nbrf(mid()))(old => old).default,
-          0)
-      )(_ + _)
+      foldhoodf[Int](_ + _) {
+        fromExpression(0) {
+          repf(nbrf(mid()))(old => old).default
+        }
+      }
     }{
-      foldhoodf(
-        fromExpression(
-          repf(mid())(old => old).default,
-          0)
-      )(_ + _)
+      foldhoodf[Int](_ + _) {
+        fromExpression(0) {
+          repf(mid())(old => old).default
+        }
+      }
     }
   }
 
@@ -93,16 +93,17 @@ class TestByEquivalence extends AnyFlatSpec with FieldTest with Matchers:
       }
 
     assertEquivalence(fixture.devicesAndNbrs, fixture.execSequence) {
-      foldhoodf(
-        fromExpression(
-          f1().default,
-          0)
-      )(_ + _)
+      foldhoodf[Int](_ + _) {
+        fromExpression(0) {
+          f1().default
+        }
+      }
     } {
-      foldhoodf(fromExpression(
-        f2().default,
-        0)
-      )(_ + _)
+      foldhoodf[Int](_ + _) {
+        fromExpression(0) {
+          f2().default
+        }
+      }
     }
   }
 
@@ -113,25 +114,25 @@ class TestByEquivalence extends AnyFlatSpec with FieldTest with Matchers:
 //    val f2: () => Field[Int] = () => foldhoodf(mid())(_ + _)
 
     assertEquivalence(fixture.devicesAndNbrs, fixture.execSequence) {
-      foldhoodf(
-        fromExpression(
-          foldhoodf(
-            fromExpression(
-              nbrf(mid()).default,
-              0
-            )
-          )(_ + _),
-        0)
-      )(_ + _)
+      foldhoodf[Int](_ + _) {
+        fromExpression(0) {
+          foldhoodf[Int](_ + _) {
+            fromExpression(0) {
+              nbrf(mid()).default
+            }
+          }
+        }
+      }
     } {
-      foldhoodf(
-        fromExpression(
-          foldhoodf(
-            fromExpression(
-              mid(),
-              0))(_ + _),
-          0)
-      )(_ + _)
+      foldhoodf[Int](_ + _) {
+        fromExpression(0) {
+          foldhoodf[Int] (_ + _) {
+            fromExpression(0) {
+              mid()
+            }
+          }
+        }
+      }
     }
   }
 
