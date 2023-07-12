@@ -93,8 +93,8 @@ trait Fields:
      * @return the result of applying the fold operator op between all the elements and z, or z if this collection is empty.
      */
     def fold[A](f: Field[A])(z: A)(aggr: (A, A) => A): A =
-      toNeighbouring(f).getMap.values.fold(z)(aggr)
-
+      f.getMap.values.fold(z)(aggr)
+    
   object FieldGivens:
     given localToFieldConversion[A]: Conversion[A, Field[A]] with
       def apply(a: A): Field[A] = Field.fromSelfValue(a)
