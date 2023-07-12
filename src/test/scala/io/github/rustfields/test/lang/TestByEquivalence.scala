@@ -136,28 +136,21 @@ class TestByEquivalence extends AnyFlatSpec with FieldTest with Matchers:
     }
   }
 
-  /*"fold.fold" should "work" in  {
+  "fold.fold" should "work" in  {
     val fixture = new Fixture
 
     assertEquivalence(fixture.devicesAndNbrs, fixture.execSequence) {
-      foldhoodf(foldhoodf(0.0)(_ + _))(_ + _)
+      foldhoodf[Double](_ + _) {
+        fromExpression(0.0) {
+          foldhoodf[Double](_ + _) {
+            fromExpression(0.0) {0.0}
+          }
+        }
+      }
     } {
-      Math.pow(foldhoodf(0.0)(_ + _), 2)
+      Math.pow(foldhoodf[Double](_ + _)(fromExpression(0.0) {0.0}), 2)
     }
-    assertEquivalence(fixture.devicesAndNbrs, fixture.execSequence) {
-      foldhoodf(
-        fromExpression(
-          foldhoodf(
-            fromExpression(
-              0.0,
-              0)
-          )(_ + _),
-          0)
-      )(_ + _)
-    } {
-      Math.pow(foldhoodf(fromExpression(0.0, 0))(_ + _), 2)
-    }
-  }*/
+  }
 
   //todo does not pass
   /*"Performance" should "not degrade when nesting foldhoods" in {
