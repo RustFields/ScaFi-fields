@@ -5,6 +5,7 @@ import io.github.rustfields.lang.FieldCalculusSyntax
 
 trait Fields:
   self: FieldCalculusSyntax =>
+
   /** A field is a map from device ids to values of type A. When a device is not
    * in the map, the default value is used.
    *
@@ -40,10 +41,26 @@ trait Fields:
     def fromSelfValue[A](a: A): Field[A] = 
       Field(Map(mid() -> a), a)
 
+    /**
+     * Dynamically creates a Field from a provided expression.
+     * Where the expression is not evaluated for a neighbour, the default value is used.
+     * @param expr the expression to evaluate for each neighbour
+     * @param default the default value to use when the expression is not evaluated for a neighbour
+     * @tparam A the type of the field
+     * @return A neighbouring field with the expression value of each neighbour that evaluated that,
+     *         or the default value
+     */
     def fromExpression[A](expr: => A, default: A): Field[A] =
       val nbrs = vm.alignedNeighbours()
       Field(nbrs.map(id => id -> vm.foldedEval(expr)(id).getOrElse(default)).toMap, default)
 
+    /**
+     * Returns the value of the field for the given device
+     * @param f the field
+     * @param id the device id
+     * @tparam A the type of the field
+     * @return the value of the field for the given device
+     */
     def get[A](f: Field[A], id: Int): A =
       f.getMap.getOrElse(id, f.default)
 
@@ -56,10 +73,24 @@ trait Fields:
     def selfValue[A](f: Field[A]): A =
       get(f, mid())
 
+    /**
+     * Returns a neighbouring field created from the given field.
+     * @param f the field
+     * @tparam A the type of the field
+     * @return A neighbouring field with the aligned neighbours of the current device that are present in the given field.
+     */
     def toNeighbouring[A](f: Field[A]): Field[A] =
       val nbrs = vm.alignedNeighbours()
       Field[A](f.getMap.filter((id, _) => nbrs.contains(id)), f.default)
 
+    /**
+     * Folds the elements of the field using the given aggregation function. The traversal order is not specified.
+     * @param f the field
+     * @param z the initial value
+     * @param aggr the aggregation function
+     * @tparam A the type of the field
+     * @return the result of applying the fold operator op between all the elements and z, or z if this collection is empty.
+     */
     def fold[A](f: Field[A])(z: A)(aggr: (A, A) => A): A =
       toNeighbouring(f).getMap.values.fold(z)(aggr)
 
