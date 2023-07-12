@@ -10,6 +10,9 @@ trait Defaultable[A]:
 object DefaultableInstances:
   given Defaultable[Int] with
     def default = 0
+    
+  given Defaultable[Double] with
+    def default = 0.0
 
   given Defaultable[String] with
     def default = ""
