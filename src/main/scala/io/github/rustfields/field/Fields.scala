@@ -51,7 +51,7 @@ trait Fields:
      * @return A neighbouring field with the expression value of each neighbour that evaluated that,
      *         or the default value
      */
-    def fromExpression[A](default: A)(expr: => A): Field[A] =
+    def fromExpression[A](default: => A)(expr: => A): Field[A] =
       val nbrs = vm.alignedNeighbours()
       Field(nbrs.map(id => id -> vm.foldedEval(expr)(id).getOrElse(default)).toMap, default)
 
