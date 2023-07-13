@@ -53,7 +53,7 @@ trait Fields:
      */
     def fromExpression[A](default: => A)(expr: => A): Field[A] =
       val nbrs = vm.alignedNeighbours()
-      Field(nbrs.map(id => id -> vm.foldedEval(expr)(id).getOrElse(default)).toMap, default)
+      Field(nbrs.map(id => id -> vm.foldedEval(expr)(id).getOrElse(vm.locally(default))).toMap, default)
 
     /**
      * Returns the value of the field for the given device
