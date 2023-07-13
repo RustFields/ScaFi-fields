@@ -11,7 +11,7 @@ trait FieldLanguage:
   def nbrf[A](expr: => A): F[A]
   def branchf[A](cond: F[Boolean])(thn: => F[A])(els: => F[A]): F[A]
   def foldhoodf[A](fun: (A, A) => A)(init: => F[A]): A
-  def fromExpression[A](default: A)(expr: => A): F[A]
+  def fromExpression[A](default: => A)(expr: => A): F[A]
 
 trait FieldLanguageImpl extends FieldLanguage with Fields with FieldOps with FieldSyntax:
   self: FieldCalculusSyntax =>
@@ -24,7 +24,7 @@ trait FieldLanguageImpl extends FieldLanguage with Fields with FieldOps with Fie
   override def nbrf[A](expr: => A): Field[A] =
     def readNeighbourValue[T](id: Int): Option[T] = vm.context.readExportValue(id, vm.status.path)
 
-    vm.nest(Nbr(vm.index))(write = vm.onlyWhenFoldingOnSelf) {
+    vm.nest(Nbr(vm.index))(write = true) {
       val nbrs = vm.alignedNeighbours()
       Field(nbrs.map(nbrId => nbrId -> readNeighbourValue(nbrId).getOrElse(expr)).toMap, expr)
     }
@@ -43,7 +43,7 @@ trait FieldLanguageImpl extends FieldLanguage with Fields with FieldOps with Fie
       }
     }
     
-  override def fromExpression[A](default: A)(expr: => A): Field[A] =
+  override def fromExpression[A](default: => A)(expr: => A): Field[A] =
     Field.fromExpression(default)(expr)
 
 object FieldLanguageImpl:
