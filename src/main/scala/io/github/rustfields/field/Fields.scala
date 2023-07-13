@@ -94,6 +94,10 @@ trait Fields:
      */
     def fold[A](f: Field[A])(z: A)(aggr: (A, A) => A): A =
       f.getMap.values.fold(z)(aggr)
+
+    def flattenField[A](ff: Field[Field[A]]): Field[A] =
+      Field(ff.getMap.map{ case (id, f) => id -> get(f, id) }, ff.default.default)
+
     
   object FieldGivens:
     given localToFieldConversion[A]: Conversion[A, Field[A]] with
