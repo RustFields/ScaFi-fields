@@ -8,10 +8,11 @@ import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
 import scala.language.implicitConversions
 import cats.implicits.*
+import io.github.rustfields.field.lang.FieldLib
 
 
-class TestLangByRound extends AnyFunSpec with FieldTest with Matchers:
-  val REPF, NBRF, BRANCHF, FOLDHOODF, Alignment, Exports = new ItWord
+class TestLangByRound extends AnyFunSpec with FieldTest with FieldLib with Matchers:
+  val REPF, NBRF, BRANCHF, FOLDHOODF, Alignment, Exports, Nesting = new ItWord
 
   val context: Context = ctx(0, Map())
 
@@ -35,14 +36,23 @@ class TestLangByRound extends AnyFunSpec with FieldTest with Matchers:
     val export0 = round(context0, program)
     val export1 = round(context1, program)
     val context2 = ctx(0, Map(0 -> export0, 1 -> export1))
-    round(context2, program).root[Field[Int]]() shouldBe Field(Map(0 -> 2),2)
+    round(context2, program).root[Field[Int]]() shouldBe
+      Field(Map(0 -> Field(Map(0 -> 2), 2), 1 -> Field(Map(1 -> 2), 2)), 2)
   }
 
-/*  FOLDHOODF("foldhoodf") {
-    def program: Int = foldhoodf[Int](_ + _)(fromExpression(0)(1))
-    val context0 = ctx(0, Map())
-    println(round(context0, program).root[Int]())
-  }*/
+  FOLDHOODF("foldhoodf") {
+    def program: Int = foldhoodf[Int](_ + _)(Field.fromSelfValue(2 + 3))
+    val context1 = ctx(0)
+    println(round(context1, program))
+  }
+
+  NBRF("needs not to be nested into fold") {
+    def program: Field[Int] = nbrf(1)
+    // ARRANGE
+    val ctx1 = ctx(0)
+    // ACT + ASSERT
+    round(ctx1, program).root[Field[Int]]() shouldBe Field(Map(0 -> 1), 1)
+  }
 
   Alignment("should support interaction only between structurally compatible devices") {
     // ARRANGE
@@ -59,23 +69,18 @@ class TestLangByRound extends AnyFunSpec with FieldTest with Matchers:
 
   Exports("should compose") {
     val ctx1 = ctx(0, Map(), Map("sensor" -> 5))
-    def expr1 = Field.fromSelfValue(1)
-    def expr2 = repf(Field.fromSelfValue(7))(f => {
+    def expr1: Field[Int] = Field.fromSelfValue(1)
+    def expr2: Field[Int] = repf(Field.fromSelfValue(7))(f => {
       for
         x <- f
         y <- Field.fromSelfValue(1)
       yield x + y
     })
-/*    def expr3 = foldhoodf(nbrf(Field.fromSelfValue(sense[Int]("sensor"))))((a, b) => {
-      for
-        x <- a
-        y <- b
-      yield x + y
-    })*/
+    def expr3: Field[Int] = nbrf(sense[Int]("sensor"))
     /* Given expr 'e' produces exports 'o'
      * What exports are produced by 'e + e + e + e' ?
      */
-    def exprComp(expr: => Field[Int]): Field[Int] =
+    def fieldExprComp(expr: => Field[Int]): Field[Int] =
       val f1: Field[Int] = expr
       val f2: Field[Int] = expr
       val f3: Field[Int] = expr
@@ -87,9 +92,9 @@ class TestLangByRound extends AnyFunSpec with FieldTest with Matchers:
         w <- f4
       yield x + y + z + w
 
-    round(ctx1, exprComp(expr1)) shouldEqual
+    round(ctx1, fieldExprComp(expr1)) shouldEqual
       Export(/ -> Field(Map(0 -> 4), 4))
-    round(ctx1, exprComp(expr2)) shouldEqual
+    round(ctx1, fieldExprComp(expr2)) shouldEqual
       Export(
         / -> Field(Map(0 -> 32), 32),
         Rep(0) -> Field(Map(0 -> 8), 8),
@@ -97,94 +102,55 @@ class TestLangByRound extends AnyFunSpec with FieldTest with Matchers:
         Rep(2) -> Field(Map(0 -> 8), 8),
         Rep(3) -> Field(Map(0 -> 8), 8),
       )
-    // TODO: CURRENTLY NOT WORKING
-/*    round(ctx1, exprComp(expr3)) shouldEqual
+    round(ctx1, fieldExprComp(expr3)) shouldEqual
       Export(
         / -> Field(Map(0 -> 20), 20),
-        FoldHood(0) / Nbr(0) -> Field(Map(0 -> 5), 5),
-        FoldHood(1) / Nbr(0) -> Field(Map(0 -> 5), 5),
-        FoldHood(2) / Nbr(0) -> Field(Map(0 -> 5), 5),
-        FoldHood(3) / Nbr(0) -> Field(Map(0 -> 5), 5),
-        FoldHood(0) -> Field(Map(0 -> 5), 5),
-        FoldHood(1) -> Field(Map(0 -> 5), 5),
-        FoldHood(2) -> Field(Map(0 -> 5), 5),
-        FoldHood(3) -> Field(Map(0 -> 5), 5)
-      )*/
+        Nbr(0) -> Field(Map(0 -> 5), 5),
+        Nbr(1) -> Field(Map(0 -> 5), 5),
+        Nbr(2) -> Field(Map(0 -> 5), 5),
+        Nbr(3) -> Field(Map(0 -> 5), 5),
+      )
 
     /* Given expr 'e' produces exports 'o'
      * What exports are produced by 'rep(0){ rep(o){ e } }' ?
      */
-    round(ctx1, repf(Field.fromSelfValue(0))(_ => repf(Field.fromSelfValue(0))(_ => expr1))) shouldEqual
+    def expr4: Field[Int] = repf(Field.fromSelfValue(0))(_ => repf(Field.fromSelfValue(0))(_ => expr1))
+    def expr5: Field[Int] = repf(Field.fromSelfValue(0))(_ => repf(Field.fromSelfValue(0))(_ => expr2))
+    def expr6: Field[Int] = repf(Field.fromSelfValue(0))(_ => repf(Field.fromSelfValue(0))(_ => expr3))
+    round(ctx1, expr4) shouldEqual
       Export(
         / -> Field(Map(0 -> 1), 1),
         Rep(0) -> Field(Map(0 -> 1), 1),
         Rep(0) / Rep(0) -> Field(Map(0 -> 1), 1)
       )
-    round(ctx1, repf(Field.fromSelfValue(0))(_ => repf(Field.fromSelfValue(0))(_ => expr2))) shouldEqual
+    round(ctx1, expr5) shouldEqual
       Export(
         / -> Field(Map(0 -> 8), 8),
         Rep(0) -> Field(Map(0 -> 8), 8),
         Rep(0) / Rep(0) -> Field(Map(0 -> 8), 8),
         Rep(0) / Rep(0) / Rep(0) -> Field(Map(0 -> 8), 8)
       )
-    // TODO: CURRENTLY NOT WORKING
-/*    round(ctx1, repf(Field.fromSelfValue(0))(_ => repf(Field.fromSelfValue(0))(_ => expr3))) shouldEqual
+    round(ctx1, expr6) shouldEqual
       Export(
         / -> Field(Map(0 -> 5), 5),
         Rep(0) -> Field(Map(0 -> 5), 5),
         Rep(0) / Rep(0) -> Field(Map(0 -> 5), 5),
-        Rep(0) / Rep(0) / FoldHood(0) -> Field(Map(0 -> 5), 5),
-        Rep(0) / Rep(0) / FoldHood(0) / Nbr(0) -> Field(Map(0 -> 5), 5)
-      )*/
+        Rep(0) / Rep(0) / Nbr(0) -> Field(Map(0 -> 5), 5),
+      )
 
-    /* Testing more NBRs within foldhood
+    /* Testing more NBRs
      */
-    // TODO: CURRENTLY NOT WORKING
-/*    round(ctx1, foldhoodf(nbrf(sense[Int]("sensor")) + nbrf(sense[Int]("sensor")))((a, b) => a + b)) shouldEqual
+    def expr7: Field[Int] = nbrf(sense[Int]("sensor")) + nbrf(sense[Int]("sensor"))
+    round(ctx1, expr7) shouldEqual
       Export(
         / -> Field(Map(0 -> 10), 10),
-        FoldHood(0) -> Field(Map(0 -> 10), 10),
-        FoldHood(0) / Nbr(0) -> Field(Map(0 -> 5), 5),
-        FoldHood(0) / Nbr(1) -> Field(Map(0 -> 5), 5)
-      )*/
+        Nbr(0) -> Field(Map(0 -> 5), 5),
+        Nbr(1) -> Field(Map(0 -> 5), 5),
+      )
   }
 
-/*  FOLDHOODF("should support aggregating information from aligned neighbors") {
-    // ARRANGE
-    val exp1 = Map(2 -> Export(/ -> "a", FoldHood(0) -> "a"), 4 -> Export(/ -> "b", FoldHood(0) -> "b"))
-    val ctx1 = ctx(0, exp1)
-    // ACT + ASSERT
-    //round(ctx1, foldhoodf(Field.fromSelfValue("a"))((x, _) => x + "z")).root[String]() shouldBe "azzz"
-
-    // ARRANGE
-    val exp2 = Map(2 -> Export(/ -> "a", FoldHood(0) -> "a"), 4 -> Export(/ -> "b", FoldHood(0) -> "b"))
-    val ctx2 = ctx(selfId = 0, exports = exp2)
-    // ACT + ASSERT (should failback to 'init' when neighbors lose alignment within foldhood)
-    round(
-      ctx2,
-      foldhood(-5)(_ + _)(if (nbr(false)) {
-        0
-      }
-      else {
-        1
-      })
-    ).root[Int]() shouldBe -14
-  }*/
-
-  NBRF("needs not to be nested into fold") {
-    def program: Field[Int] = nbrf(Field.fromSelfValue(1))
-    // ARRANGE
-    val ctx1 = ctx(0)
-    // ACT + ASSERT
-    round(ctx1, program).root[Field[Int]]() shouldBe Field(Map(0 -> 1), 1)
-  }
-
-/*  NBRF("should support interaction between aligned devices") {
-    def program: Field[Int] =
-      if (nbrf(Field.fromSelfValue(mid())) == Field.fromSelfValue(mid()))
-        Field.fromSelfValue(0)
-      else
-        Field.fromSelfValue(1)
+  NBRF("should support interaction between aligned devices") {
+    def program: Field[Int] = for x <- nbrf(mid()) yield if (x == mid()) 0 else 1
     // ARRANGE
     val exp1 = Map(
       1 -> Export(/ -> "any", Nbr(0) -> 1),
@@ -194,9 +160,9 @@ class TestLangByRound extends AnyFunSpec with FieldTest with Matchers:
     // ACT
     val res1 = round(ctx1, program)
     // ASSERT
-    res1.root[Int]() shouldBe 2
-    res1.get(FoldHood(0) / Nbr(0)) shouldBe Some(0)
-  }*/
+    res1.root[Field[Int]]() shouldBe Field(Map(0 -> 0, 1 -> 1, 2 -> 1), 0)
+    res1.get(/(Nbr(0))) shouldBe Some(Field(Map(0 -> 0, 1 -> 1, 2 -> 2), 0))
+  }
 
   REPF("should support dynamic evolution of fields") {
     def program: Field[Int] = repf(Field.fromSelfValue(9))(f => for x <- f yield x * 2)
@@ -234,56 +200,3 @@ class TestLangByRound extends AnyFunSpec with FieldTest with Matchers:
     val exp2 = round(ctx2, program)
     exp2.root[Field[Int]]() shouldBe Field(Map(0 -> 2), 2)
   }
-
-/*  Nesting("REP into FOLDHOOD should be supported") {
-    // ARRANGE
-    val ctx1 = ctx(0, Map(1 -> exportFrom(FoldHood(0) -> 7), 2 -> exportFrom(FoldHood(0) -> 7)))
-
-    def program1 = foldhood("init")(_ + _)(rep(0)(_ + 1) + "")
-
-    val ctx2 =
-      ctx(0, Map(1 -> exportFrom(FoldHood(0) -> 7), 2 -> exportFrom(FoldHood(0) -> 7, FoldHood(0) / Nbr(0) -> 7)))
-
-    def program2 = foldhood("init")(_ + _)(nbr(rep(0)(_ + 1)) + "")
-
-    // ACT + ASSERT
-    val exp1 = round(ctx1, program1)
-    exp1.root[String] shouldEqual "init111"
-    ctx1.updateExport(0, exp1)
-    round(ctx1, program1).root[String] shouldEqual "init222"
-
-    val exp2 = round(ctx2, program2)
-    assertPossibleFolds("init", List("init", "7", "1")) {
-      exp2.root[String]
-    }
-    ctx2.updateExport(0, exp2)
-    assertPossibleFolds("init", List("init", "7", "2")) {
-      round(ctx2, program2).root[String]
-    }
-  }*/
-
-/*  Nesting("FOLDHOOD into FOLDHOOD should be supported") {
-    // ARRANGE
-    val ctx1 = ctx(
-      0,
-      Map(
-        1 -> exportFrom(FoldHood(0) -> 7, FoldHood(0) / FoldHood(0) -> 7),
-        2 -> exportFrom(
-          FoldHood(0) -> 7,
-          FoldHood(0) / Nbr(0) -> 7,
-          FoldHood(0) / FoldHood(0) -> 7,
-          FoldHood(0) / Nbr(0) / FoldHood(0) -> 7
-        )
-      )
-    )
-
-    // ACT + ASSERT
-    round(ctx1, foldhood("init")(_ + _)(foldhood(0)(_ + _)(1) + "")).root[String] shouldEqual "init333"
-
-    assertPossibleFolds("init", List("init", "7", "2")) {
-      round(ctx1, foldhood("init")(_ + _)(nbr(foldhood(0)(_ + _)(1)) + "")).root[String]
-    }
-  }*/
-
-/*  private def assertPossibleFolds(init: Any, a: List[Any])(expr: => Any): Unit =
-    a.permutations.map(l => init + l.mkString).toList should contain(expr)*/
