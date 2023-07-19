@@ -6,12 +6,14 @@ import io.github.rustfields.vm.Path.*
 import io.github.rustfields.vm.{Context, Export}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
+
 import scala.language.implicitConversions
 import cats.implicits.*
 import io.github.rustfields.field.lang.FieldLib
+import io.github.rustfields.field.syntax.FieldSyntax
 
 
-class TestLangByRound extends AnyFunSpec with FieldTest with FieldLib with Matchers:
+class TestLangByRound extends AnyFunSpec with FieldTest with FieldLib with FieldSyntax with Matchers:
   val REPF, NBRF, BRANCHF, FOLDHOODF, Alignment, Exports, Nesting = new ItWord
 
   val context: Context = ctx(0, Map())
@@ -37,7 +39,7 @@ class TestLangByRound extends AnyFunSpec with FieldTest with FieldLib with Match
     val export1 = round(context1, program)
     val context2 = ctx(0, Map(0 -> export0, 1 -> export1))
     round(context2, program).root[Field[Int]]() shouldBe
-      Field(Map(0 -> Field(Map(0 -> 2), 2), 1 -> Field(Map(1 -> 2), 2)), 2)
+      Field(Map(0 -> 2, 1 -> 2), 2)
   }
 
   FOLDHOODF("foldhoodf") {
@@ -60,7 +62,7 @@ class TestLangByRound extends AnyFunSpec with FieldTest with FieldLib with Match
 
   Alignment("should support interaction only between structurally compatible devices") {
     // ARRANGE
-    def program: Field[Int] = repf(Field.lift(0))(x => nbrf(x + Field.lift(1)))
+    def program: Field[Int] = repf(Field.fromSelfValue(0))(x => nbrf(x.selfValue + 1))
     val ctx1 = ctx(0)
     // ACT + ASSERT (no neighbor is aligned)
     round(ctx1, program).root[Field[Int]]() shouldBe Field(Map(0 -> 1), 1)
