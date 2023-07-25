@@ -43,13 +43,14 @@ class TestLangByRound extends AnyFunSpec with FieldTest with FieldLib with Field
   }
 
   FOLDHOODF("foldhoodf") {
-    def program: Int = foldhoodf[Int](_ + _)(Field.fromSelfValue(2 + 3))
-    val context0 = ctx(0, Map())
-    val context1 = ctx(1, Map())
+    def program: Int = foldhoodf[Int](_ + _)(nbrf(2+3))
+    val context0 = ctx(0)
+    val context1 = ctx(1)
     val export0 = round(context0, program)
     val export1 = round(context1, program)
     val context2 = ctx(0, Map(0 -> export0, 1 -> export1))
-    round(context2, program).root[Int]() shouldBe 10
+    val export00 = round(context2, program)
+    export00.root[Int]() shouldBe 15
   }
 
   NBRF("needs not to be nested into fold") {
