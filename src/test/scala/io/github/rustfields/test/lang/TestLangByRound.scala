@@ -6,7 +6,7 @@ import io.github.rustfields.vm.Path.*
 import io.github.rustfields.vm.{Context, Export}
 import org.scalatest.funspec.AnyFunSpec
 import org.scalatest.matchers.should.Matchers
-
+import org.scalactic.Prettifier.default
 import scala.language.implicitConversions
 import cats.implicits.*
 import io.github.rustfields.field.lang.FieldLib
