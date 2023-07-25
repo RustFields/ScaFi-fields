@@ -42,7 +42,7 @@ trait FieldLanguageImpl extends FieldLanguage with Fields with FieldOps with Fie
 
   override def foldhoodf[A](fun: (A, A) => A)(init: => Field[A]): A =
     vm.nest(FoldHood(vm.index))(write = true) {
-        vm.isolate(init.neighbouring.fold(vm.locally(init.default))(fun))
+        init.neighbouring.fold(init.default)(fun)
     }
     
   override def fromExpression[A](default: => A)(expr: => A): Field[A] =
