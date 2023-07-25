@@ -9,6 +9,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalactic.Prettifier.default
 import scala.language.implicitConversions
 import cats.implicits.*
+import cats.syntax.all.*
 import io.github.rustfields.field.lang.FieldLib
 import io.github.rustfields.field.syntax.FieldSyntax
 
