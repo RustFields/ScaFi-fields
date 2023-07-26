@@ -2,6 +2,8 @@ package io.github.rustfields.field
 
 import cats.Monad
 import io.github.rustfields.lang.FieldCalculusSyntax
+
+import scala.annotation.tailrec
 import scala.language.implicitConversions
 
 trait Fields:
@@ -94,7 +96,10 @@ trait Fields:
      */
     def fold[A](f: Field[A])(z: A)(aggr: (A, A) => A): A =
       f.getMap.values.fold(z)(aggr)
-
+      
+    def fold[A](f: Field[A])(aggr: (A, A) => A)(using d: Defaultable[A]): A =
+      fold(f)(d.default)(aggr)
+    
     def flattenField[A](ff: Field[Field[A]]): Field[A] =
       Field(ff.getMap.map{ case (id, f) => id -> get(f, id) }, ff.default.default)
 
