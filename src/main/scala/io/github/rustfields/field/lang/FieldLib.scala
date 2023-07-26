@@ -1,7 +1,15 @@
 package io.github.rustfields.field.lang
 
+import io.github.rustfields.field.Defaultable
+import io.github.rustfields.vm.Slot.FoldHood
+
 trait FieldLib:
   self: FieldLanguageImpl.FieldLanguageComponent =>
+
+  def foldhoodfDef[A](aggr: (A, A) => A)(init: => Field[A])(using d: Defaultable[A]): A =
+    vm.nest(FoldHood(vm.index))(write = true) {
+      Field.fold(init.neighbouring)(aggr)
+    }
 
   /**
    * Creates a field "on the fly" from an expression and then performs a folded operation on it 
