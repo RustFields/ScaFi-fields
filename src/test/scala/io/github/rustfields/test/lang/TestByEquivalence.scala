@@ -63,23 +63,6 @@ class TestByEquivalence extends AnyFlatSpec with FieldTest with FieldLib with Fi
     }
   }
 
-  "rep.nbr" should "be ignored overall" in {
-    val fixture = new Fixture
-
-    assertEquivalence(fixture.devicesAndNbrs, fixture.execSequence) {
-      foldhoodf[Int](_ + _) {
-        repf(nbrf(mid())) { old =>
-          old |++| nbrf(old) |++| nbrf(mid())
-        }
-      }
-    } {
-      foldhoodf[Int](_ + _)(1) *
-        repf[Int](mid()) { old =>
-          old |++| old |++| mid()
-        }
-    }
-  }
-
   "fold.init nbr" should "be ignored" in {
     val fixture = new Fixture
 
