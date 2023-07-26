@@ -1,20 +1,19 @@
 package io.github.rustfields.test.lang
 
-import io.github.rustfields.test.{FieldTest, TestUtils}
-import org.scalatest.funspec.AnyFunSpec
-import org.scalatest.matchers.should.Matchers
-import io.github.rustfields.field.DefaultableInstances.given_Defaultable_Int
+import io.github.rustfields.field.lang.FieldLib
+import io.github.rustfields.field.syntax.FieldSyntax
+import io.github.rustfields.test.FieldTest
+import io.github.rustfields.field.DefaultableInstances.given
 import org.scalatest.flatspec.AnyFlatSpec
-import org.scalactic.Prettifier.default
-import scala.collection.SeqView.Id
+import org.scalatest.matchers.should.Matchers
+import cats.instances.all.*
+import cats.syntax.all.*
+import scala.language.implicitConversions
 import scala.collection.mutable
-import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
 
 
-class TestByEquivalence extends AnyFlatSpec with FieldTest with Matchers:
-//  val checkThat = new ItWord
-
+class TestByEquivalence extends AnyFlatSpec with FieldTest with FieldLib with FieldSyntax with Matchers:
   given node: TestByEquivalence = this
 
   class Fixture:
@@ -24,101 +23,72 @@ class TestByEquivalence extends AnyFlatSpec with FieldTest with Matchers:
 
   "fold" should "work with multiple nbrs" in {
     val fixture = new Fixture
-//    val f1: () => Field[Int] = () => nbrf(1) + nbrf(2) + nbrf(mid())
-//    val f2: () => Field[Int] = () => nbrf(1 + 2 + mid())
 
     assertEquivalence(fixture.devicesAndNbrs, fixture.execSequence) {
       foldhoodf[Int](_ + _) {
-        fromExpression(0) {
-          nbrf(1) + nbrf(2) + nbrf(mid())
-        }
+        nbrf(1) |++| nbrf(2) |++| nbrf(mid())
       }
     } {
       foldhoodf[Int](_ + _) {
-        fromExpression(0) {
-          nbrf(1 + 2 + mid()).default
-        }
+        nbrf(1 + 2 + mid())
       }
     }
   }
 
   "nbr.nbr" should "be ignored" in {
     val fixture = new Fixture
-    //    val f1: () => Field[Int] = () => nbrf(mid() + nbrf(mid()).default).default
-    val f2: () => Field[Int] = () => nbrf(mid())
 
     assertEquivalence(fixture.devicesAndNbrs, fixture.execSequence) {
       foldhoodf[Int](_ + _) {
-        fromExpression(0) {
-          nbrf(mid() + nbrf(mid())).default
-        }
+        nbrf(mid() + nbrf(mid()).selfValue)
       }
     } {
       2 * foldhoodf[Int](_ + _) {
-        fromExpression(0) {
-          nbrf(mid()).default
-        }
+        nbrf(mid())
       }
     }
   }
 
   "rep.nbr" should "be ignored on first argument" in {
     val fixture = new Fixture
-    val f1: () => Field[Int] = () => repf(nbrf(mid()))(old => old)
-    val f2: () => Field[Int] = () => repf(mid())(old => old)
 
     assertEquivalence(fixture.devicesAndNbrs, fixture.execSequence){
       foldhoodf[Int](_ + _) {
-        fromExpression(0) {
-          repf(nbrf(mid()))(old => old).default
-        }
+        repf(nbrf(mid()))(old => old)
       }
     }{
       foldhoodf[Int](_ + _) {
-        fromExpression(0) {
-          repf(mid())(old => old).default
-        }
+        repf(mid())(old => old)
       }
     }
   }
 
   "rep.nbr" should "be ignored overall" in {
     val fixture = new Fixture
-    val f1: () => Field[Int] = () => repf(nbrf(mid())) { old =>
-      old + nbrf(old.default) + nbrf(mid())
-    }
-    val f2: () => Field[Int] = () => (1) *
-      repf(mid()) { old =>
-        old * 2 + mid()
-      }
 
     assertEquivalence(fixture.devicesAndNbrs, fixture.execSequence) {
       foldhoodf[Int](_ + _) {
-        fromExpression(0) {
-          f1().default
+        repf(nbrf(mid())) { old =>
+          old |++| nbrf(old) |++| nbrf(mid())
         }
       }
     } {
-      foldhoodf[Int](_ + _) {
-        fromExpression(0) {
-          f2().default
+      foldhoodf[Int](_ + _)(1) *
+        repf[Int](mid()) { old =>
+          old |++| old |++| mid()
         }
-      }
     }
   }
 
   "fold.init nbr" should "be ignored" in {
     val fixture = new Fixture
 
-//    val f1: () => Field[Int] = () => foldhoodf(nbrf(mid()))(_ + _)
-//    val f2: () => Field[Int] = () => foldhoodf(mid())(_ + _)
-
     assertEquivalence(fixture.devicesAndNbrs, fixture.execSequence) {
       foldhoodf[Int](_ + _) {
         fromExpression(0) {
           foldhoodf[Int](_ + _) {
             fromExpression(0) {
-              nbrf(mid()).default
+              nbrf(mid())
             }
           }
         }
