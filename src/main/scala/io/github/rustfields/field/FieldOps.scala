@@ -4,11 +4,17 @@ package io.github.rustfields.field
 import cats.kernel.Monoid
 import cats.syntax.all.*
 
+import scala.annotation.targetName
+
 trait FieldOps:
   self: Fields =>
 
   export FieldGivens.given
   export cats.instances.all._
+
+  extension[A](fld: Field[A])
+    @targetName("mappendWith")
+    def |++|(other: Field[A])(using m: Monoid[A]): Field[A] = mappendFields(fld, other)
 
   /**
    * Apply a field of functions to a field
