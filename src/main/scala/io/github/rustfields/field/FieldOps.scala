@@ -6,6 +6,9 @@ import cats.syntax.all.*
 
 import scala.annotation.targetName
 
+/**
+ * This trait defines additional syntax and operations with [[io.github.rustfields.field.Fields]]
+ */
 trait FieldOps:
   self: Fields =>
 

@@ -4,9 +4,11 @@ trait FieldFactories:
   self: Fields =>
   
   export DefaultableInstances.given
+  
   def fromDefaultableExpr[A](expr: => A)(using d: Defaultable[A]): Field[A] =
     Field.fromExpression(d.default)(expr)
-  def fromIntExpr(expr: => Int): Field[Int] =
+    
+  def fromInt(expr: => Int): Field[Int] =
     fromDefaultableExpr[Int](expr)
 
   def fromDouble(expr: => Double): Field[Double] =
