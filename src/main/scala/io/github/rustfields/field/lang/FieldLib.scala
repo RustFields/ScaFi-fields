@@ -8,7 +8,7 @@ trait FieldLib:
 
   def foldhoodfDef[A](aggr: (A, A) => A)(init: => Field[A])(using d: Defaultable[A]): A =
     vm.nest(FoldHood(vm.index))(write = true) {
-      Field.fold(init.neighbouring)(aggr)
+      Field.foldDef(init.neighbouring)(aggr)
     }
 
   /**
