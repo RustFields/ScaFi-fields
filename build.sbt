@@ -9,5 +9,5 @@ lazy val root = (project in file("."))
   .settings(
     name := "ScaFi-fields",
     libraryDependencies += "org.scalatest" %% "scalatest" % "3.2.16" % "test",
-    libraryDependencies += "org.typelevel" %% "cats-core" % "2.9.0"
+    libraryDependencies += "org.typelevel" %% "cats-core" % "2.10.0"
   ).dependsOn(core)
