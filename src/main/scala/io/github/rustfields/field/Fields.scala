@@ -3,7 +3,6 @@ package io.github.rustfields.field
 import cats.Monad
 import io.github.rustfields.lang.FieldCalculusSyntax
 
-import scala.annotation.tailrec
 import scala.language.implicitConversions
 
 trait Fields:
@@ -96,8 +95,16 @@ trait Fields:
      */
     def fold[A](f: Field[A])(z: A)(aggr: (A, A) => A): A =
       f.getMap.values.fold(z)(aggr)
-      
-    def fold[A](f: Field[A])(aggr: (A, A) => A)(using d: Defaultable[A]): A =
+
+    /**
+     * * Folds the elements of the field using the given aggregation function and an implicit default value as initial value for the aggregation. The traversal order is not specified.
+     * @param f the field
+     * @param aggr the aggregation function
+     * @param d the [[Defaultable]] instance
+     * @tparam A the type of the field
+     * @return the result of applying the fold operator op between all the elements and d, or d if this collection is empty.
+     */
+    def foldDef[A](f: Field[A])(aggr: (A, A) => A)(using d: Defaultable[A]): A =
       fold(f)(d.default)(aggr)
     
     def flattenField[A](ff: Field[Field[A]]): Field[A] =
